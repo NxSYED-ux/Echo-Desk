@@ -1,0 +1,47 @@
+name: Generate Contribution
+
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+jobs:
+  commit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # Make small dummy changes to keep activity real
+      - name: Create random change
+        run: |
+          echo "$(date): $(shuf -n 1 -e 'Refactored a module' 'Fixed typo' 'Optimized logic' 'Improved code readability' 'Minor update' 'Updated docs' 'Improved performance' 'Cleaned unused variables' 'Tweaked build script' 'Minor fix')" >> daily-log.txt
+
+      # Pick a random commit message
+      - name: Pick random message
+        id: commit_message
+        run: |
+          messages=(
+            "Refactor utility function"
+            "Optimize component rendering"
+            "Fix small logic issue"
+            "Improve variable naming"
+            "Update build config"
+            "Enhance documentation"
+            "Cleanup unused imports"
+            "Adjust layout for consistency"
+            "Improve readability of script"
+            "Minor tweak in configuration"
+          )
+          random_index=$((RANDOM % ${#messages[@]}))
+          echo "message=${messages[$random_index]}" >> $GITHUB_OUTPUT
+
+      # Commit and push
+      - name: Push random commit
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: "daily-log.txt"
+          message: "${{ steps.commit_message.outputs.message }}"
+          author_name: "NxSYED-ux"
